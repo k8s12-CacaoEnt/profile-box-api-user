@@ -1,8 +1,8 @@
 FROM openjdk:17
 
-ADD ./build/libs/*SNAPSHOT.jar app.jar
+ADD ./build/libs/*SNAPSHOT.war app.war
 
-ENTRYPOINT ["java", "-jar", "app.jar", "--spring.profiles.active=prod"]
+ENTRYPOINT ["java", "-jar", "app.war", "--spring.profiles.active=prod"]
 #
 ## Base image
 #FROM adoptopenjdk:17-jdk-hotspot
