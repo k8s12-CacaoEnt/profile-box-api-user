@@ -1,14 +1,15 @@
 package com.goorm.profileboxapiuser.service;
 
-import com.goorm.profileboxcomm.utils.FileHandler;
-import com.goorm.profileboxcomm.entity.Member;
-import com.goorm.profileboxcomm.entity.Profile;
+import com.goorm.profileboxapiuser.repository.MemberRepository;
+import com.goorm.profileboxapiuser.repository.ProfileRepository;
 import com.goorm.profileboxcomm.dto.image.request.CreateImageRequestDto;
 import com.goorm.profileboxcomm.dto.profile.request.CreateProfileRequestDto;
 import com.goorm.profileboxcomm.dto.profile.request.SelectProfileListRequestDto;
 import com.goorm.profileboxcomm.dto.video.request.CreateVideoRequestDto;
-import com.goorm.profileboxapiuser.repository.MemberRepository;
-import com.goorm.profileboxapiuser.repository.ProfileRepository;
+import com.goorm.profileboxcomm.entity.MemberEntity;
+import com.goorm.profileboxcomm.entity.ProfileEntity;
+import com.goorm.profileboxcomm.utils.FileHandler;
+import com.goorm.profileboxcomm.utils.S3Uploader;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -28,21 +29,22 @@ public class ProfileService {
     private final ProfileRepository profileRepository;
     private final MemberRepository memberRepository;
     private final FileHandler fileHandler;
+    private final S3Uploader s3Uploader;
 
-    public Page<Profile> getAllProfile(SelectProfileListRequestDto requestDto) {
+    public Page<ProfileEntity> getAllProfile(SelectProfileListRequestDto requestDto) {
         int offset = requestDto.getOffset();
         int limit = requestDto.getLimit();
         String sortKey = requestDto.getSortKey();
         return profileRepository.findAll(PageRequest.of(offset, limit, Sort.by(sortKey)));
     }
 
-    public Profile getProfileByProfileId(String profileId) {
+    public ProfileEntity getProfileByProfileId(String profileId) {
         return profileRepository.findProfileByProfileId(Long.parseLong(profileId));
     }
 
     @Transactional
     public void addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
-        Member member = memberRepository.findMemberByMemberId(Long.parseLong(profileDto.getMemberId()));
+        MemberEntity member = memberRepository.findMemberByMemberId(Long.parseLong(profileDto.getMemberId()));
         // 유효성 체크 먼저
 
         // 이미지, 동영상 처리 후 profileDto 로 넣어줄까
@@ -61,7 +63,7 @@ public class ProfileService {
         }
 
         // 프로필 데이터 생성
-        Profile profile = Profile.createProfile(profileDto, member);
+        ProfileEntity profile = ProfileEntity.createProfile(profileDto, member);
         profileRepository.save(profile);
         System.out.println("teset");
 //        // 프로필 저장

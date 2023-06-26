@@ -1,3 +1,8 @@
+spring:
+  profiles:
+    include:
+      - comm
+---
 logging:
   level:
     root: DEBUG
@@ -29,30 +34,8 @@ spring:
       hibernate:
         format_sql: true
         default_batch_fetch_size: 1000
-#  datasource:
-#    url: jdbc:postgresql://localhost:5432/profile_box
-#    url: jdbc:postgresql://docker.for.mac.host.internal:5432/profile_box
-#    username: admin
-#    password: admin
-#  autoconfigure:
-#    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
 
-#custom:
-#  storage:
-##    filePath: /Users/hyenee/Downloads/workspace/goorm/msa/storage/files/
-#    filePath: /storage/files/
-#    imagePath: images/
-#    videoPath: videos/
 ---
-spring:
-  config:
-    activate:
-      on-profile: local
-  datasource:
-    url: jdbc:postgresql://localhost:5432/profile_box
-    username: admin
-    password: admin
-
 server:
   config:
     activate:
@@ -62,41 +45,61 @@ server:
   tomcat:
     max-swallow-size: -1
 
-custom:
-  config:
-    activate:
-      on-profile: local
-  storage:
-    filePath: /Users/hyenee/Downloads/workspace/goorm/msa/storage/files/
-    imagePath: images/
-    videoPath: videos/
----
 spring:
   config:
     activate:
-      on-profile: prod
+      on-profile: local
   datasource:
-    #    url: jdbc:postgresql://docker.for.mac.host.internal:5432/profile_box
-    #    username: admin
-    #    password: admin
-    url: jdbc:postgresql://rds-profilehub2.c28euk17mhxq.ap-northeast-2.rds.amazonaws.com:5432/profilehub
-    username: cacao
-    password: cacaocacao
+    url: jdbc:postgresql://localhost:5432/profile_box
+    username: admin
+    password: admin
 
-server:
-  config:
-    activate:
-      on-profile: prod
-  port: 8080
-  error.include-message: always
-  tomcat:
-    max-swallow-size: -1
 
-custom:
-  config:
-    activate:
-      on-profile: prod
-  storage:
-    filePath: /storage/files/
-    imagePath: images/
-    videoPath: videos/
+#
+#spring:
+#  config:
+#    activate:
+#      on-profile: local
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/profile_box
+#    username: admin
+#    password: admin
+#
+#custom:
+#  config:
+#    activate:
+#      on-profile: local
+#  storage:
+#    filePath: /Users/hyenee/Downloads/workspace/goorm/msa/storage/files/
+#    imagePath: images/
+#    videoPath: videos/
+#---
+#server:
+#  config:
+#    activate:
+#      on-profile: prod
+#  port: 8080
+#  error.include-message: always
+#  tomcat:
+#    max-swallow-size: -1
+#
+#spring:
+#  config:
+#    activate:
+#      on-profile: prod
+#  datasource:
+#    #    url: jdbc:postgresql://docker.for.mac.host.internal:5432/profile_box
+#    #    username: admin
+#    #    password: admin
+#    url: jdbc:postgresql://rds-profilehub2.c28euk17mhxq.ap-northeast-2.rds.amazonaws.com:5432/profilehub
+#    username: cacao
+#    password: cacaocacao
+#
+#custom:
+#  config:
+#    activate:
+#      on-profile: prod
+#  storage:
+#    filePath: /storage/files/
+#    imagePath: images/
+#    videoPath: videos/

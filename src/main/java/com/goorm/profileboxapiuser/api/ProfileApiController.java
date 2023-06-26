@@ -1,6 +1,6 @@
 package com.goorm.profileboxapiuser.api;
 
-import com.goorm.profileboxcomm.entity.Profile;
+import com.goorm.profileboxcomm.entity.ProfileEntity;
 import com.goorm.profileboxcomm.dto.profile.request.CreateProfileRequestDto;
 import com.goorm.profileboxcomm.dto.profile.request.SelectProfileListRequestDto;
 import com.goorm.profileboxcomm.dto.profile.response.SelectProfileResponseDto;
@@ -22,7 +22,7 @@ public class ProfileApiController {
 
     @GetMapping("/profile")
     public List<SelectProfileResponseDto> getProfiles(@ModelAttribute SelectProfileListRequestDto requestDto) {
-        Page<Profile> profiles = profileService.getAllProfile(requestDto);
+        Page<ProfileEntity> profiles = profileService.getAllProfile(requestDto);
         List<SelectProfileResponseDto> result = profiles.stream()
                 .map(o -> new SelectProfileResponseDto(o))
                 .collect(toList());
@@ -31,7 +31,7 @@ public class ProfileApiController {
 
     @GetMapping("/profile/{profileId}")
     public SelectProfileResponseDto getProfile(@PathVariable String profileId){
-        Profile profile = profileService.getProfileByProfileId(profileId);
+        ProfileEntity profile = profileService.getProfileByProfileId(profileId);
         return profile != null ? new SelectProfileResponseDto(profile) : null;
     }
 

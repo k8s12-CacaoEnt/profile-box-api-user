@@ -44,6 +44,17 @@ server:
   error.include-message: always
   tomcat:
     max-swallow-size: -1
+
+spring:
+  config:
+    activate:
+      on-profile: local
+  datasource:
+    url: jdbc:postgresql://localhost:5432/profile_box
+    username: admin
+    password: admin
+
+
 #
 #spring:
 #  config:

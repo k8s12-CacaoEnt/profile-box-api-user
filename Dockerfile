@@ -4,7 +4,7 @@ ADD ./build/libs/*SNAPSHOT.war app.war
 
 ENTRYPOINT ["java", "-jar", "app.war", "--spring.profiles.active=prod"]
 #
-## Base image
+## Base imageEntity
 #FROM adoptopenjdk:17-jdk-hotspot
 #
 ## Set the working directory
