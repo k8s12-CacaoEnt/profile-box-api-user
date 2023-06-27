@@ -1,10 +1,16 @@
 package com.goorm.profileboxapiuser.api;
 
-import com.goorm.profileboxcomm.entity.ProfileEntity;
+import com.goorm.profileboxapiuser.service.ProfileService;
 import com.goorm.profileboxcomm.dto.profile.request.CreateProfileRequestDto;
 import com.goorm.profileboxcomm.dto.profile.request.SelectProfileListRequestDto;
 import com.goorm.profileboxcomm.dto.profile.response.SelectProfileResponseDto;
-import com.goorm.profileboxapiuser.service.ProfileService;
+import com.goorm.profileboxcomm.entity.Profile;
+import com.goorm.profileboxcomm.enumeration.ApiResultType;
+import com.goorm.profileboxcomm.enumeration.ExceptionEnum;
+import com.goorm.profileboxcomm.utils.ApiException;
+import com.goorm.profileboxcomm.utils.ApiResult;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
@@ -21,26 +27,43 @@ public class ProfileApiController {
     private final ProfileService profileService;
 
     @GetMapping("/profile")
-    public List<SelectProfileResponseDto> getProfiles(@ModelAttribute SelectProfileListRequestDto requestDto) {
-        Page<ProfileEntity> profiles = profileService.getAllProfile(requestDto);
-        List<SelectProfileResponseDto> result = profiles.stream()
-                .map(o -> new SelectProfileResponseDto(o))
-                .collect(toList());
-        return result;
+    public ApiResult getProfiles(@ModelAttribute SelectProfileListRequestDto requestDto) {
+        try{
+            Page<Profile> profiles = profileService.getAllProfile(requestDto);
+            List<SelectProfileResponseDto> result = profiles.stream()
+                    .map(o -> new SelectProfileResponseDto(o))
+                    .collect(toList());
+            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회", result);
+        }catch (Exception e){
+            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
     }
 
     @GetMapping("/profile/{profileId}")
-    public SelectProfileResponseDto getProfile(@PathVariable String profileId){
-        ProfileEntity profile = profileService.getProfileByProfileId(profileId);
-        return profile != null ? new SelectProfileResponseDto(profile) : null;
+    public ApiResult getProfile(@PathVariable String profileId){
+        try{
+            Profile profile = profileService.getProfileByProfileId(profileId);
+            // 프로필 검색 결과 없으면 어떻게 처리할지~ 현재는 걍 null
+            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 조회", profile != null ? new SelectProfileResponseDto(profile) : null);
+        }catch (Exception e){
+            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
     }
 
     @PostMapping("/profile")
-    public String addProfile(@RequestPart(value = "data") CreateProfileRequestDto profileDto,
-                             @RequestPart(value = "images") List<MultipartFile> imageFiles,
-                             @RequestPart(value = "videos") List<MultipartFile> videoFiles) {
-
-        profileService.addProfile(profileDto, imageFiles, videoFiles);
-        return "";
+    public ApiResult addProfile(@Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto,
+                                @Valid @Size(min = 1, max = 5, message = "이미지는 최소1장/최대5장 첨부 가능합니다.")
+                                @RequestPart(value = "images") List<@Valid MultipartFile> imageFiles,
+                                @Size(max = 2, message = "동영상은 최대2개 첨부 가능합니다.")
+                                @RequestPart(value = "videos") List<@Valid MultipartFile> videoFiles) {
+        try{
+            if (imageFiles.isEmpty()) {
+                throw new ApiException(ExceptionEnum.INVALID_REQUEST);
+            }
+            Profile profile = profileService.addProfile(profileDto, imageFiles, videoFiles);
+            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", profile != null ? new SelectProfileResponseDto(profile) : null);
+        }catch (Exception e){
+            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
     }
 }
