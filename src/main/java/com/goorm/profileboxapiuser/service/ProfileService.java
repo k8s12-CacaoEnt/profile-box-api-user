@@ -48,7 +48,7 @@ public class ProfileService {
     }
 
     @Transactional
-    public Profile addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
+    public Long addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
         Member member = memberRepository.findMemberByMemberId(profileDto.getMemberId());
 
         if (member == null) {
@@ -70,7 +70,6 @@ public class ProfileService {
                 CreateImageRequestDto dto = imageDtoList.get(idx);
                 Image image = Image.createImage(dto, profile);
                 imageRepository.save(image);
-//                profile.addImage(image);
                 if(idx == profileDto.getDefaultImageIdx()){
                     profile.setDefaultImageId(image.getImgageId());
                 }
@@ -84,7 +83,6 @@ public class ProfileService {
             for (CreateVideoRequestDto dto : videoDtoList) {
                 Video video = Video.createVideo(dto, profile);
                 videoRepository.save(video);
-//                profile.addVideo(video);
             }
         }
 
@@ -92,7 +90,6 @@ public class ProfileService {
             for (CreateFilmoRequestDto dto : profileDto.getFilmos()) {
                 Filmo filmo = Filmo.createFilmo(dto, profile);
                 filmoRepository.save(filmo);
-//                profile.addFilmo(filmo);
             }
         }
 
@@ -100,9 +97,8 @@ public class ProfileService {
             for (CreateLinkRequestDto dto : profileDto.getLinks()) {
                 Link link = Link.createLink(dto, profile);
                 linkRepository.save(link);
-//                profile.addLink(link);
             }
         }
-        return profile;
+        return profile.getProfileId();
     }
 }

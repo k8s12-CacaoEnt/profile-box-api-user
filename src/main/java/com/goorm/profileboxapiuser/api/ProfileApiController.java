@@ -55,13 +55,13 @@ public class ProfileApiController {
                                 @Valid @Size(min = 1, max = 5, message = "이미지는 최소1장/최대5장 첨부 가능합니다.")
                                 @RequestPart(value = "images") List<@Valid MultipartFile> imageFiles,
                                 @Size(max = 2, message = "동영상은 최대2개 첨부 가능합니다.")
-                                @RequestPart(value = "videos") List<@Valid MultipartFile> videoFiles) {
+                                @RequestPart(value = "videos") List<MultipartFile> videoFiles) {
         try{
             if (imageFiles.isEmpty()) {
                 throw new ApiException(ExceptionEnum.INVALID_REQUEST);
             }
-            Profile profile = profileService.addProfile(profileDto, imageFiles, videoFiles);
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", profile != null ? new SelectProfileResponseDto(profile) : null);
+            Long profileId = profileService.addProfile(profileDto, imageFiles, videoFiles);
+            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", profileId);
         }catch (Exception e){
             throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
         }
