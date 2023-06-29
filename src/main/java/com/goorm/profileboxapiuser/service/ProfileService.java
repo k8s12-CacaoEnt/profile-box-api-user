@@ -7,9 +7,9 @@ import com.goorm.profileboxcomm.dto.profile.request.CreateProfileRequestDto;
 import com.goorm.profileboxcomm.dto.profile.request.SelectProfileListRequestDto;
 import com.goorm.profileboxcomm.dto.video.request.CreateVideoRequestDto;
 import com.goorm.profileboxcomm.entity.*;
+import com.goorm.profileboxcomm.exception.ApiException;
 import com.goorm.profileboxcomm.exception.ExceptionEnum;
 import com.goorm.profileboxcomm.repository.*;
-import com.goorm.profileboxcomm.exception.ApiException;
 import com.goorm.profileboxcomm.utils.FileHandler;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +33,6 @@ public class ProfileService {
     private final VideoRepository videoRepository;
     private final FilmoRepository filmoRepository;
     private final LinkRepository linkRepository;
-
     private final FileHandler fileHandler;
 
     public Page<Profile> getAllProfile(SelectProfileListRequestDto requestDto) {
@@ -43,23 +42,26 @@ public class ProfileService {
         return profileRepository.findAll(PageRequest.of(offset, limit, Sort.by(sortKey)));
     }
 
-    public Profile getProfileByProfileId(String profileId) {
-        return profileRepository.findProfileByProfileId(Long.parseLong(profileId));
+    public Profile getProfileByProfileId(Long profileId) {
+        return profileRepository.findProfileByProfileId(profileId)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
     }
 
     @Transactional
-    public Long addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
-        Member member = memberRepository.findMemberByMemberId(profileDto.getMemberId());
-
-        if (member == null) {
-            throw new ApiException(ExceptionEnum.MEMBER_NOT_FOUND);
-        }
+    public Profile addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
+//        Member member = memberRepository.findMemberByMemberId(profileDto.getMemberId());
+//
+//        if (member == null) {
+//            throw new ApiException(ExceptionEnum.MEMBER_NOT_FOUND);
+//        }
+        Member member = memberRepository.findMemberByMemberId(profileDto.getMemberId())
+                .orElseThrow(() -> new ApiException(ExceptionEnum.MEMBER_NOT_FOUND));
 
         Profile profile = Profile.createProfile(profileDto, member);
         profileRepository.save(profile);
 
         if (images != null & images.size() > 1) {
-            if (profileDto.getDefaultImageIdx() < 0 || profileDto.getDefaultImageIdx() > images.size()-1) {
+            if (profileDto.getDefaultImageIdx() < 0 || profileDto.getDefaultImageIdx() > images.size() - 1) {
                 profileDto.setDefaultImageIdx(0);
             }
 
@@ -70,7 +72,7 @@ public class ProfileService {
                 CreateImageRequestDto dto = imageDtoList.get(idx);
                 Image image = Image.createImage(dto, profile);
                 imageRepository.save(image);
-                if(idx == profileDto.getDefaultImageIdx()){
+                if (idx == profileDto.getDefaultImageIdx()) {
                     profile.setDefaultImageId(image.getImgageId());
                 }
             }
@@ -99,6 +101,23 @@ public class ProfileService {
                 linkRepository.save(link);
             }
         }
-        return profile.getProfileId();
+        return profileRepository.findProfileByProfileId(profile.getProfileId())
+                .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
+    }
+
+    @Transactional
+    public Profile updateProfile(Long profileId, CreateProfileRequestDto profileDto) {
+        Profile profile = profileRepository.findProfileByProfileId(profileId)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
+//        if (patchRequest.getName() != null) {
+////        user.setName(patchRequest.getName());
+////    }
+        profile = profileRepository.save(profile);
+        return profile;
+    }
+
+    @Transactional
+    public void deleteProfile(Long ProfileId) {
+        profileRepository.deleteByProfileId(ProfileId);
     }
 }

@@ -5,10 +5,10 @@ import com.goorm.profileboxcomm.dto.profile.request.CreateProfileRequestDto;
 import com.goorm.profileboxcomm.dto.profile.request.SelectProfileListRequestDto;
 import com.goorm.profileboxcomm.dto.profile.response.SelectProfileResponseDto;
 import com.goorm.profileboxcomm.entity.Profile;
-import com.goorm.profileboxcomm.response.ApiResultType;
-import com.goorm.profileboxcomm.exception.ExceptionEnum;
 import com.goorm.profileboxcomm.exception.ApiException;
+import com.goorm.profileboxcomm.exception.ExceptionEnum;
 import com.goorm.profileboxcomm.response.ApiResult;
+import com.goorm.profileboxcomm.response.ApiResultType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
@@ -40,11 +40,10 @@ public class ProfileApiController {
     }
 
     @GetMapping("/profile/{profileId}")
-    public ApiResult getProfile(@PathVariable String profileId){
+    public ApiResult getProfile(@PathVariable Long profileId){
         try{
             Profile profile = profileService.getProfileByProfileId(profileId);
-            // 프로필 검색 결과 없으면 어떻게 처리할지~ 현재는 걍 null
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 조회", profile != null ? new SelectProfileResponseDto(profile) : null);
+            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 조회", profile);
         }catch (Exception e){
             throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
         }
@@ -60,8 +59,26 @@ public class ProfileApiController {
             if (imageFiles.isEmpty()) {
                 throw new ApiException(ExceptionEnum.INVALID_REQUEST);
             }
-            Long profileId = profileService.addProfile(profileDto, imageFiles, videoFiles);
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", profileId);
+            Profile profile = profileService.addProfile(profileDto, imageFiles, videoFiles);
+            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", profile);
+        }catch (Exception e){
+            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
+        }
+    }
+
+
+    @PatchMapping("/profile/{profileId}")
+    public ApiResult updateProfile(@PathVariable Long profileId, @Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto){
+        Profile profile = profileService.updateProfile(profileId, profileDto);
+        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 수정", profile);
+    }
+
+
+    @GetMapping("/profile/{profileId}")
+    public ApiResult deleteProfile(@PathVariable Long profileId){
+        try{
+            profileService.deleteProfile(profileId);
+            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 삭제", null);
         }catch (Exception e){
             throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
         }
