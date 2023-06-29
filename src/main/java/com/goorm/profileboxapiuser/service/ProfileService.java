@@ -49,11 +49,6 @@ public class ProfileService {
 
     @Transactional
     public Profile addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
-//        Member member = memberRepository.findMemberByMemberId(profileDto.getMemberId());
-//
-//        if (member == null) {
-//            throw new ApiException(ExceptionEnum.MEMBER_NOT_FOUND);
-//        }
         Member member = memberRepository.findMemberByMemberId(profileDto.getMemberId())
                 .orElseThrow(() -> new ApiException(ExceptionEnum.MEMBER_NOT_FOUND));
 
