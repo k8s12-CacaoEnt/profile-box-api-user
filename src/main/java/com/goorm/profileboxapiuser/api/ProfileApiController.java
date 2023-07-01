@@ -28,28 +28,18 @@ public class ProfileApiController {
 
     @GetMapping("/profile")
     public ApiResult<List<SelectProfileResponseDto>> getProfiles(@ModelAttribute SelectProfileListRequestDto requestDto) {
-        try{
-            Page<Profile> profiles = profileService.getAllProfile(requestDto);
-            List<SelectProfileResponseDto> result = profiles.stream()
-                    .map(o -> new SelectProfileResponseDto(o))
-                    .collect(toList());
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회", result);
-        }catch (Exception e){
-            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
-        }
+        Page<Profile> profiles = profileService.getAllProfile(requestDto);
+        List<SelectProfileResponseDto> result = profiles.stream()
+                .map(o -> new SelectProfileResponseDto(o))
+                .collect(toList());
+        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회", result);
     }
 
     @GetMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> getProfile(@PathVariable Long profileId){
-        try{
-            Profile profile = profileService.getProfileByProfileId(profileId);
-            SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 조회", result);
-        }catch (ApiException e){
-            throw e;
-        }catch (Exception e){
-            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
-        }
+        Profile profile = profileService.getProfileByProfileId(profileId);
+        SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
+        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 조회", result);
     }
 
     @PostMapping("/profile")
@@ -58,40 +48,24 @@ public class ProfileApiController {
                                 @RequestPart(value = "images") List<@Valid MultipartFile> imageFiles,
                                 @Size(max = 2, message = "동영상은 최대2개 첨부 가능합니다.")
                                 @RequestPart(value = "videos") List<MultipartFile> videoFiles) {
-        try {
-            if (imageFiles.isEmpty()) {
-                throw new ApiException(ExceptionEnum.INVALID_REQUEST);
-            }
-            Profile profile = profileService.addProfile(profileDto, imageFiles, videoFiles);
-            SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", result);
-        }catch (ApiException e) {
-            throw e;
-        }catch (Exception e){
-            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
+        if (imageFiles.isEmpty()) {
+            throw new ApiException(ExceptionEnum.INVALID_REQUEST);
         }
+        Profile profile = profileService.addProfile(profileDto, imageFiles, videoFiles);
+        SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
+        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", result);
     }
 
     @PatchMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> updateProfile(@PathVariable Long profileId, @Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto){
-        try{
-            Profile profile = profileService.updateProfile(profileId, profileDto);
-            SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 수정", result);
-        }catch (ApiException e) {
-            throw e;
-        }catch (Exception e){
-            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
-        }
+        Profile profile = profileService.updateProfile(profileId, profileDto);
+        SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
+        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 수정", result);
     }
 
     @DeleteMapping("/profile/{profileId}")
     public ApiResult deleteProfile(@PathVariable Long profileId){
-        try{
-            profileService.deleteProfile(profileId);
-            return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 삭제", null);
-        }catch (Exception e){
-            throw new ApiException(ExceptionEnum.RUNTIME_EXCEPTION);
-        }
+        profileService.deleteProfile(profileId);
+        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 삭제", null);
     }
 }
