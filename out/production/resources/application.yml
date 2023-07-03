@@ -3,6 +3,18 @@ spring:
     include:
       - comm
 ---
+server:
+  config:
+    activate:
+      on-profile: prod
+  port: 8080
+  error.include-message: always
+  tomcat:
+    max-swallow-size: -1
+  host:
+    adminApi: http://profile-box-api-admin.default.svc.local:8080
+    commApi: http://profile-box-comm.default.svc.local:8080
+---
 logging:
   level:
     root: DEBUG
@@ -44,6 +56,9 @@ server:
   error.include-message: always
   tomcat:
     max-swallow-size: -1
+  host:
+    adminApi: http://localhost:7002
+    commApi: http://localhost:7003
 
 spring:
   config:
@@ -53,6 +68,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/profile_box
     username: admin
     password: admin
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      group-id: myGroup
 
 
 #

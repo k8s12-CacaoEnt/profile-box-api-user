@@ -1,4 +1,4 @@
-package com.goorm.profileboxapiuser.api;
+package com.goorm.profileboxapiuser.controller;
 
 import com.goorm.profileboxapiuser.service.ProfileService;
 import com.goorm.profileboxcomm.dto.profile.request.CreateProfileRequestDto;

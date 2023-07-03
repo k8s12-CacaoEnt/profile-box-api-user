@@ -1,4 +1,4 @@
-package com.goorm.profileboxapiadmin.auth;
+package com.goorm.profileboxapiuser.auth;
 
 import com.goorm.profileboxcomm.entity.Member;
 import lombok.Data;
@@ -41,21 +41,21 @@ public class PrincipalDetails implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return false;
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return false;
+        return true;
     }
 }

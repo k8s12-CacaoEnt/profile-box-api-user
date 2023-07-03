@@ -1,8 +1,8 @@
-package com.goorm.profileboxapiadmin.auth;
+package com.goorm.profileboxapiuser.auth;
 
 
-import com.goorm.profileboxcomm.repository.MemberRepository;
-import lombok.AllArgsConstructor;
+import com.goorm.profileboxapiuser.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -10,47 +10,47 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.filter.CorsFilter;
 
 @EnableWebSecurity
 @Configuration
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class SecurityConfig {
 
-    private CorsFilter corsFilter;
-    private AuthenticationConfiguration authenticationConfiguration;
-    private MemberRepository memberRepository;
+    private final CorsFilter corsFilter;
+    private final MemberService memberService;
+    private final AuthenticationConfiguration authenticationConfiguration;
 
-    @Bean
     public AuthenticationManager authenticationManager() throws Exception{
         return authenticationConfiguration.getAuthenticationManager();
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        // 면접에서 물어볼만한 질문: 인증방식 중에 하나를 선택햇 ㅓ jwt를 선택한건데 왜 세션을 사용하냐?. 왜 jwt를 사용했는지?
-
-        http.httpBasic().disable()
-                .csrf().disable()
-                .cors().and()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS); // csrf
-
-        http.authorizeHttpRequests()
-                .requestMatchers("/v1/auth/member/login", "/v1/auth/member/register").permitAll()
-//                .requestMatchers("api/v1/notice/admin/**").hasRole("ADMIN") // 추후에 usertype을 나누는게 확실하다면 이 주석 풀기.
-//                .anyRequest().permitAll();
-                .anyRequest().authenticated()
-                .and()
-                .addFilter(corsFilter)
-                .addFilter(new JwtAuthenticationFilter(authenticationManager()))
-//                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberRepository))
-                .formLogin().disable();
-
-        return http.build();
+    public BCryptPasswordEncoder passwordEncoder(){
+        return new BCryptPasswordEncoder();
     }
 
-//    loginProcessingUrl
+    @Bean
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+        return http.httpBasic().disable()
+                .csrf().disable()
+                .cors()
+                .and()
+                .addFilter(corsFilter)
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberService))
+                .authorizeHttpRequests()
+//                .requestMatchers("/v1/auth/member/login", "/v1/auth/member/register").permitAll()
+//                .anyRequest().permitAll()
+                // hasRole이나 hasAnyRole은 "ROLE_" prefix를 붙여버림.
+//                .requestMatchers("v1/notice/admin/**").hasAnyAuthority("ADMIN", "PRODUCER")
+                //.requestMatchers("v1/notice/admin/**").hasAuthority("ADMIN")
+                .anyRequest().authenticated()
+                .and()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // csrf
+                .and()
+                .build();
+    }
 
 }
