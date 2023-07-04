@@ -37,7 +37,7 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회", result);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'PRODUCER', 'ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUCER', 'ACTOR')")
     @GetMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> getProfile(@PathVariable Long profileId){
         Profile profile = profileService.getProfileByProfileId(profileId);
@@ -46,7 +46,7 @@ public class ProfileApiController {
     }
 
 
-    @PreAuthorize("hasRole('ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ACTOR')")
     @PostMapping("/profile")
     public ApiResult<Long> addProfile(@Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto,
                                      @Valid @Size(min = 1, max = 5, message = "이미지는 최소1장/최대5장 첨부 가능합니다.")
@@ -63,7 +63,7 @@ public class ProfileApiController {
     }
 
 
-    @PreAuthorize("hasRole('ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ACTOR')")
     @PatchMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> updateProfile(@PathVariable Long profileId, @Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto){
         Profile profile = profileService.updateProfile(profileId, profileDto);
@@ -71,34 +71,34 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 수정", result);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/{profileId}")
     public ApiResult deleteProfile(@PathVariable Long profileId){
         profileService.deleteProfile(profileId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 삭제", null);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/image/{imageId}")
     public ApiResult deleteImage(@PathVariable Long imageId){
         profileService.deleteImage(imageId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "이미지 삭제", null);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/video/{videoId}")
     public ApiResult deleteVideo(@PathVariable Long videoId){
         profileService.deleteVideo(videoId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "비디오 삭제", null);
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/filmo/{filmoId}")
     public ApiResult deleteFilmo(@PathVariable Long filmoId){
         profileService.deleteFilmo(filmoId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "필모그래피 삭제", null);
     }
-    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/link/{linkId}")
     public ApiResult deleteLink(@PathVariable Long linkId){
         profileService.deleteLink(linkId);
