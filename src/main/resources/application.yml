@@ -1,3 +1,5 @@
+
+
 spring:
   profiles:
     include:
@@ -12,12 +14,20 @@ server:
   tomcat:
     max-swallow-size: -1
   host:
-    adminApi: http://www.profilehub.info/api/admin
-    commApi: http://www.profilehub.info/api/comm
-#    api-user.default.svc.cluster.local:8080
-#    adminApi: http://profile-box-api-admin.default.svc.local:8080
-#    commApi: http://profile-box-comm.default.svc.local:8080
----
+    adminApi: http://profile-box-api-admin.default.svc.cluster.local:8080
+    commApi: http://profile-box-comm.default.svc.cluster.local:8080
+
+springdoc:
+  config:
+    activate:
+      on-profile: prod
+  api-docs:
+    path: /api/user/v3/api-docs
+#  swagger-ui:
+##    disable-swagger-default-url: true
+##    path: /api/user/
+#    oauth2RedirectUrl: /api/user/swagger-ui/oauth2-redirect.html
+#    config-url: /api/user/v3/api-docs/swagger-config
 logging:
   level:
     root: DEBUG
@@ -62,6 +72,18 @@ server:
   host:
     adminApi: http://localhost:7002
     commApi: http://localhost:7003
+
+springdoc:
+  config:
+    activate:
+      on-profile: local
+  api-docs:
+    path: /v3/api-docs
+#  swagger-ui:
+#    oauth2RedirectUrl: /swagger-ui/oauth2-redirect.html
+#    config-url: /v3/api-docs/swagger-config
+#    disable-swagger-default-url: true
+#    path: /
 
 spring:
   config:

@@ -24,7 +24,14 @@ public class SecurityConfig {
     private final CorsFilter corsFilter;
     private final MemberService memberService;
     private final AuthenticationConfiguration authenticationConfiguration;
-    private final String[] allowedUrls = {"/", "/swagger-ui/**", "/swagger-resources/**", "/v3/api-docs/**"};
+    private final String[] allowedUrls = {"/"
+                            , "/swagger-ui/**"
+                            , "/swagger-resources/**"
+                            , "/v3/api-docs/**"
+                            , "/api/user/swagger-ui/**"
+                            , "/api/user/swagger-resources/**"
+                            , "/api/user/v3/api-docs/**"
+    };
 
     public AuthenticationManager authenticationManager() throws Exception{
         return authenticationConfiguration.getAuthenticationManager();
@@ -44,10 +51,6 @@ public class SecurityConfig {
                 .addFilter(corsFilter)
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberService))
                 .authorizeHttpRequests()
-//                .anyRequest().permitAll()
-                // hasRole이나 hasAnyRole은 "ROLE_" prefix를 붙여버림.
-//                .requestMatchers("v1/notice/admin/**").hasAnyAuthority("ADMIN", "PRODUCER")
-                //.requestMatchers("v1/notice/admin/**").hasAuthority("ADMIN")
                 .requestMatchers(allowedUrls).permitAll()
                 .anyRequest().authenticated()
                 .and()
