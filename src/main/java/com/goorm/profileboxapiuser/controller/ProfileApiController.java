@@ -9,10 +9,12 @@ import com.goorm.profileboxcomm.exception.ApiException;
 import com.goorm.profileboxcomm.exception.ExceptionEnum;
 import com.goorm.profileboxcomm.response.ApiResult;
 import com.goorm.profileboxcomm.response.ApiResultType;
+import io.swagger.v3.oas.annotations.enums.SecuritySchemeType;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -22,6 +24,7 @@ import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequiredArgsConstructor
+//@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 @RequestMapping("/v1")
 public class ProfileApiController {
     private final ProfileService profileService;
@@ -35,6 +38,7 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회", result);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('PRODUCER') or hasRole('ACTOR')")
     @GetMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> getProfile(@PathVariable Long profileId){
         Profile profile = profileService.getProfileByProfileId(profileId);
@@ -42,6 +46,8 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 조회", result);
     }
 
+
+    @PreAuthorize("hasRole('ACTOR')")
     @PostMapping("/profile")
     public ApiResult<SelectProfileResponseDto> addProfile(@Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto,
                                 @Valid @Size(min = 1, max = 5, message = "이미지는 최소1장/최대5장 첨부 가능합니다.")
@@ -56,6 +62,8 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", result);
     }
 
+
+    @PreAuthorize("hasRole('ACTOR')")
     @PatchMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> updateProfile(@PathVariable Long profileId, @Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto){
         Profile profile = profileService.updateProfile(profileId, profileDto);
@@ -63,6 +71,7 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 수정", result);
     }
 
+    @PreAuthorize("hasRole('ADMIN') or hasRole('ACTOR')")
     @DeleteMapping("/profile/{profileId}")
     public ApiResult deleteProfile(@PathVariable Long profileId){
         profileService.deleteProfile(profileId);

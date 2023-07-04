@@ -7,6 +7,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.authentication.configuration.EnableGlobalAuthentication;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -22,6 +24,7 @@ public class SecurityConfig {
     private final CorsFilter corsFilter;
     private final MemberService memberService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final String[] allowedUrls = {"/", "/swagger-ui/**", "/v3/**"};
 
     public AuthenticationManager authenticationManager() throws Exception{
         return authenticationConfiguration.getAuthenticationManager();
@@ -41,11 +44,11 @@ public class SecurityConfig {
                 .addFilter(corsFilter)
                 .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberService))
                 .authorizeHttpRequests()
-//                .requestMatchers("/v1/auth/member/login", "/v1/auth/member/register").permitAll()
 //                .anyRequest().permitAll()
                 // hasRole이나 hasAnyRole은 "ROLE_" prefix를 붙여버림.
 //                .requestMatchers("v1/notice/admin/**").hasAnyAuthority("ADMIN", "PRODUCER")
                 //.requestMatchers("v1/notice/admin/**").hasAuthority("ADMIN")
+                .requestMatchers(allowedUrls).permitAll()
                 .anyRequest().authenticated()
                 .and()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS) // csrf
