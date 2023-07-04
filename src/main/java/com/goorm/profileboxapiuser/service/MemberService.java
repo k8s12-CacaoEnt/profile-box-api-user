@@ -1,9 +1,10 @@
 package com.goorm.profileboxapiuser.service;
 
 import com.goorm.profileboxcomm.entity.Member;
+import com.goorm.profileboxcomm.exception.ApiException;
+import com.goorm.profileboxcomm.exception.ExceptionEnum;
 import com.goorm.profileboxcomm.response.ApiResult;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.common.protocol.types.Field;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
@@ -47,7 +48,11 @@ public class MemberService {
                 .expand(email)
                 .toUri();
 
-        ResponseEntity<ApiResult<Member>> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<ApiResult<Member>>() {});
-        return responseEntity.getBody().getData();
+        try{
+            ResponseEntity<ApiResult<Member>> responseEntity = restTemplate.exchange(uri, HttpMethod.GET, requestEntity, new ParameterizedTypeReference<ApiResult<Member>>() {});
+            return responseEntity.getBody().getData();
+        }catch (Exception e){
+            throw new ApiException(ExceptionEnum.NOT_RESPONSE_ADMIN_API);
+        }
     }
 }
