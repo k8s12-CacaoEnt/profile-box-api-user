@@ -127,29 +127,54 @@ public class ProfileService {
 
     @Transactional
     public void deleteProfile(Long profileId) {
-        // 관련 파일도 삭제 되어야함, 존재하면 삭제, 존재하지 않으면 삭제 안함
+
+        Profile profile = profileRepository.findProfileByProfileId(profileId)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
+
+        imageRepository.findImagesByProfile(profile)
+                .ifPresent(images -> {
+                    images.stream().peek(image -> fileHandler.deleteFile(image.getFilePath()));
+                });
+
+        videoRepository.findVideosByProfile(profile)
+                .ifPresent(videos -> {
+                    videos.stream().peek(video -> fileHandler.deleteFile(video.getFilePath()));
+                });
+
         profileRepository.deleteByProfileId(profileId);
     }
 
     @Transactional
     public void deleteImage(Long imageId) {
-        // 관련 파일도 삭제 되어야함, 존재하면 삭제, 존재하지 않으면 삭제 안함
+        Image image = imageRepository.findImageByImageId(imageId)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.IMAGE_NOT_FOUND));
+
+        fileHandler.deleteFile(image.getFilePath());
         imageRepository.deleteByImageId(imageId);
     }
 
     @Transactional
     public void deleteVideo(Long videoId) {
-        // 관련 파일도 삭제 되어야함, 존재하면 삭제, 존재하지 않으면 삭제 안함
+        Video video = videoRepository.findVideoByVideoId(videoId)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.VIDEO_NOT_FOUND));
+
+        fileHandler.deleteFile(video.getFilePath());
         videoRepository.deleteByVideoId(videoId);
     }
 
     @Transactional
     public void deleteFilmo(Long filmoId) {
+        filmoRepository.findFilmoByFilmoId(filmoId)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.FILMO_NOT_FOUND));
+
         filmoRepository.deleteByFilmoId(filmoId);
     }
 
     @Transactional
     public void deleteLink(Long linkId) {
+        linkRepository.findLinkByLinkId(linkId)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.LINK_NOT_FOUND));
+
         linkRepository.deleteByLinkId(linkId);
     }
 }
