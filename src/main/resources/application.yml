@@ -12,8 +12,10 @@ server:
   tomcat:
     max-swallow-size: -1
   host:
-    adminApi: http://profile-box-api-admin.default.svc.local:8080
-    commApi: http://profile-box-comm.default.svc.local:8080
+    adminApi: http://www.profilehub.info/api/user
+    commApi: http://www.profilehub.info/api/comm
+#    adminApi: http://profile-box-api-admin.default.svc.local:8080
+#    commApi: http://profile-box-comm.default.svc.local:8080
 ---
 logging:
   level:

@@ -14,6 +14,7 @@ import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -23,7 +24,6 @@ import static java.util.stream.Collectors.toList;
 
 @RestController
 @RequiredArgsConstructor
-//@SecurityScheme(name = "bearerAuth", type = SecuritySchemeType.HTTP, bearerFormat = "JWT", scheme = "bearer")
 @RequestMapping("/v1")
 public class ProfileApiController {
     private final ProfileService profileService;
@@ -37,7 +37,7 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회", result);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'PRODUCER', 'ACTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'PRODUCER', 'ACTOR')")
     @GetMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> getProfile(@PathVariable Long profileId){
         Profile profile = profileService.getProfileByProfileId(profileId);
@@ -46,7 +46,7 @@ public class ProfileApiController {
     }
 
 
-    @PreAuthorize("hasAuthority('ACTOR')")
+    @PreAuthorize("hasRole('ACTOR')")
     @PostMapping("/profile")
     public ApiResult<Long> addProfile(@Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto,
                                      @Valid @Size(min = 1, max = 5, message = "이미지는 최소1장/최대5장 첨부 가능합니다.")
@@ -63,7 +63,7 @@ public class ProfileApiController {
     }
 
 
-    @PreAuthorize("hasAuthority('ACTOR')")
+    @PreAuthorize("hasRole('ACTOR')")
     @PatchMapping("/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> updateProfile(@PathVariable Long profileId, @Valid @RequestPart(value = "data") CreateProfileRequestDto profileDto){
         Profile profile = profileService.updateProfile(profileId, profileDto);
@@ -71,34 +71,34 @@ public class ProfileApiController {
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 수정", result);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/{profileId}")
     public ApiResult deleteProfile(@PathVariable Long profileId){
         profileService.deleteProfile(profileId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 삭제", null);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/image/{imageId}")
     public ApiResult deleteImage(@PathVariable Long imageId){
         profileService.deleteImage(imageId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "이미지 삭제", null);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/video/{videoId}")
     public ApiResult deleteVideo(@PathVariable Long videoId){
         profileService.deleteVideo(videoId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "비디오 삭제", null);
     }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/filmo/{filmoId}")
     public ApiResult deleteFilmo(@PathVariable Long filmoId){
         profileService.deleteFilmo(filmoId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "필모그래피 삭제", null);
     }
-    @PreAuthorize("hasAnyAuthority('ADMIN', 'ACTOR')")
+    @PreAuthorize("hasAnyRole('ADMIN', 'ACTOR')")
     @DeleteMapping("/profile/link/{linkId}")
     public ApiResult deleteLink(@PathVariable Long linkId){
         profileService.deleteLink(linkId);
