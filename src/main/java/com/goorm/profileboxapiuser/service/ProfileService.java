@@ -19,6 +19,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -47,10 +48,19 @@ public class ProfileService {
                 .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
     }
 
+    // 1:1
+    public boolean existsProfileByMemberId(Member member) {
+        return profileRepository.existsProfileByMember(member);
+    }
+
     @Transactional
-    public Profile addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
+    public Long addProfile(CreateProfileRequestDto profileDto, List<MultipartFile> images, List<MultipartFile> videos) {
         Member member = memberRepository.findMemberByMemberId(profileDto.getMemberId())
                 .orElseThrow(() -> new ApiException(ExceptionEnum.MEMBER_NOT_FOUND));
+
+        if(existsProfileByMemberId(member)){
+            throw new ApiException(ExceptionEnum.PROFILE_ALREADY_EXIST);
+        }
 
         Profile profile = Profile.createProfile(profileDto, member);
         profileRepository.save(profile);
@@ -59,45 +69,49 @@ public class ProfileService {
             if (profileDto.getDefaultImageIdx() < 0 || profileDto.getDefaultImageIdx() > images.size() - 1) {
                 profileDto.setDefaultImageIdx(0);
             }
-
+            List<Image> imageList = new ArrayList<>();
             List<CreateImageRequestDto> imageDtoList = images.stream()
                     .map(o -> fileHandler.imageWrite(o))
                     .collect(toList());
             for (int idx = 0; idx < imageDtoList.size(); idx++) {
                 CreateImageRequestDto dto = imageDtoList.get(idx);
                 Image image = Image.createImage(dto, profile);
-                imageRepository.save(image);
+                imageList.add(image);
                 if (idx == profileDto.getDefaultImageIdx()) {
-                    profile.setDefaultImageId(image.getImgageId());
+                    profile.setDefaultImageId(image.getImageId());
                 }
             }
+            profileRepository.save(profile);
+            imageRepository.saveAll(imageList);
         }
 
         if (videos != null & videos.size() > 1) {
+            List<Video> videoList = new ArrayList<>();
             List<CreateVideoRequestDto> videoDtoList = videos.stream()
                     .map(o -> fileHandler.videoWrite(o))
                     .collect(toList());
             for (CreateVideoRequestDto dto : videoDtoList) {
-                Video video = Video.createVideo(dto, profile);
-                videoRepository.save(video);
+                videoList.add(Video.createVideo(dto, profile));
             }
+            videoRepository.saveAll(videoList);
         }
 
         if (profileDto.getFilmos() != null & profileDto.getFilmos().size() > 0) {
+            List<Filmo> filmoList = new ArrayList<>();
             for (CreateFilmoRequestDto dto : profileDto.getFilmos()) {
-                Filmo filmo = Filmo.createFilmo(dto, profile);
-                filmoRepository.save(filmo);
+                filmoList.add(Filmo.createFilmo(dto, profile));
             }
+            filmoRepository.saveAll(filmoList);
         }
 
         if (profileDto.getLinks() != null & profileDto.getLinks().size() > 0) {
+            List<Link> linkList = new ArrayList<>();
             for (CreateLinkRequestDto dto : profileDto.getLinks()) {
-                Link link = Link.createLink(dto, profile);
-                linkRepository.save(link);
+                linkList.add(Link.createLink(dto, profile));
             }
+            linkRepository.saveAll(linkList);
         }
-        return profileRepository.findProfileByProfileId(profile.getProfileId())
-                .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
+        return profile.getProfileId();
     }
 
     @Transactional
@@ -112,7 +126,30 @@ public class ProfileService {
     }
 
     @Transactional
-    public void deleteProfile(Long ProfileId) {
-        profileRepository.deleteByProfileId(ProfileId);
+    public void deleteProfile(Long profileId) {
+        // 관련 파일도 삭제 되어야함, 존재하면 삭제, 존재하지 않으면 삭제 안함
+        profileRepository.deleteByProfileId(profileId);
+    }
+
+    @Transactional
+    public void deleteImage(Long imageId) {
+        // 관련 파일도 삭제 되어야함, 존재하면 삭제, 존재하지 않으면 삭제 안함
+        imageRepository.deleteByImageId(imageId);
+    }
+
+    @Transactional
+    public void deleteVideo(Long videoId) {
+        // 관련 파일도 삭제 되어야함, 존재하면 삭제, 존재하지 않으면 삭제 안함
+        videoRepository.deleteByVideoId(videoId);
+    }
+
+    @Transactional
+    public void deleteFilmo(Long filmoId) {
+        filmoRepository.deleteByFilmoId(filmoId);
+    }
+
+    @Transactional
+    public void deleteLink(Long linkId) {
+        linkRepository.deleteByLinkId(linkId);
     }
 }
