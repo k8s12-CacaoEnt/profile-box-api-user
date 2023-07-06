@@ -24,13 +24,11 @@ public class SecurityConfig {
     private final CorsFilter corsFilter;
     private final MemberService memberService;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtProvider jwtProvider;
     private final String[] allowedUrls = {"/"
                             , "/swagger-ui/**"
                             , "/swagger-resources/**"
                             , "/v3/api-docs/**"
-                            , "/api/user/swagger-ui/**"
-                            , "/api/user/swagger-resources/**"
-                            , "/api/user/v3/api-docs/**"
     };
 
     public AuthenticationManager authenticationManager() throws Exception{
@@ -49,7 +47,7 @@ public class SecurityConfig {
                 .cors()
                 .and()
                 .addFilter(corsFilter)
-                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberService))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager(), memberService, jwtProvider))
                 .authorizeHttpRequests()
                 .requestMatchers(allowedUrls).permitAll()
                 .anyRequest().authenticated()

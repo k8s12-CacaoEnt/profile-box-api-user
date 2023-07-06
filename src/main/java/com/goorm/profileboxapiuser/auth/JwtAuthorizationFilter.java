@@ -22,24 +22,23 @@ import java.io.IOException;
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
 
     private final MemberService memberService;
+    private JwtProvider jwtProvider;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager,MemberService memberService) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager,MemberService memberService, JwtProvider jwtProvider) {
         super(authenticationManager);
         this.memberService = memberService;
+        this.jwtProvider = jwtProvider;
     }
 
     @SneakyThrows
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
-        String jwtHeader = request.getHeader(JwtProperties.HEADER_STRING);
+    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+        String clientJwtToken = jwtProvider.getJwtAccessTokenFromCookie(request);
 
-        if(jwtHeader == null || !jwtHeader.startsWith(JwtProperties.TOKEN_PREFIX)){
-//            throw new ApiException(ExceptionEnum.TOKEN_NOT_FOUND);
+        if(clientJwtToken.equals("")){
             chain.doFilter(request, response);
             return;
         }
-
-        String clientJwtToken = request.getHeader(JwtProperties.HEADER_STRING).replace(JwtProperties.TOKEN_PREFIX,"");
         String email = JWT.require(Algorithm.HMAC512(JwtProperties.SECRET)).build().verify(clientJwtToken).getClaim("email").asString();
         // throw new ApiException(ExceptionEnum.EXFIRED_TOKEN);
 

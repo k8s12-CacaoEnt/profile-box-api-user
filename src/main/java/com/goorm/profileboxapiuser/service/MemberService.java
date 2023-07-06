@@ -1,5 +1,6 @@
 package com.goorm.profileboxapiuser.service;
 
+import com.goorm.profileboxapiuser.auth.JwtProperties;
 import com.goorm.profileboxcomm.entity.Member;
 import com.goorm.profileboxcomm.exception.ApiException;
 import com.goorm.profileboxcomm.exception.ExceptionEnum;
@@ -36,13 +37,14 @@ public class MemberService {
     public Member findLoginMemberByEmail(String email, String clientJwtToken) throws ExecutionException, InterruptedException {
         String url = adminApiUrl;
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, "Bearer " + clientJwtToken);
+        headers.set(HttpHeaders.COOKIE, JwtProperties.ACCESS_TOKEN_COOKIE + "=" + clientJwtToken);
+
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
         URI uri = UriComponentsBuilder
                 .fromUriString(url)
-                .path("/v1/auth/member/{email}")
+                .path("/v1/member/email/{email}")
                 .encode()
                 .build()
                 .expand(email)
