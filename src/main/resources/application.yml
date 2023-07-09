@@ -12,8 +12,8 @@ server:
   tomcat:
     max-swallow-size: -1
   host:
-    adminApi: http://profile-box-api-admin.default.svc.cluster.local:8080
-    commApi: http://profile-box-comm.default.svc.cluster.local:8080
+    adminApi: https://profile-box-api-admin.default.svc.cluster.local:8080
+    commApi: https://profile-box-comm.default.svc.cluster.local:8080
 ---
 server:
   servlet:

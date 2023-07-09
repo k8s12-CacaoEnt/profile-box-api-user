@@ -27,7 +27,7 @@ import static java.util.stream.Collectors.toList;
 public class ProfileApiController {
     private final ProfileService profileService;
 
-    @GetMapping("/profile")
+    @GetMapping("/open/profile")
     public ApiResult<List<SelectProfileResponseDto>> getProfiles(@ModelAttribute SelectProfileListRequestDto requestDto) {
         Page<Profile> profiles = profileService.getAllProfile(requestDto);
         List<SelectProfileResponseDto> result = profiles.stream()
@@ -97,6 +97,7 @@ public class ProfileApiController {
         profileService.deleteFilmo(filmoId);
         return ApiResult.getResult(ApiResultType.SUCCESS, "필모그래피 삭제", null);
     }
+
     @PreAuthorize("hasAnyAuthority('ADMIN','ACTOR')")
     @DeleteMapping("/profile/link/{linkId}")
     public ApiResult deleteLink(@PathVariable Long linkId){
