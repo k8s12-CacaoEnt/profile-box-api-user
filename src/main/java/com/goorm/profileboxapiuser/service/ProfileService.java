@@ -131,9 +131,14 @@ public class ProfileService {
         Profile profile = profileRepository.findProfileByProfileId(profileId)
                 .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
 
+//        imageRepository.findImagesByProfile(profile)
+//                .ifPresent(images -> {
+//                    images.stream().peek(image -> fileHandler.deleteFile(image.getFilePath()));
+//                });
+
         imageRepository.findImagesByProfile(profile)
                 .ifPresent(images -> {
-                    images.stream().peek(image -> fileHandler.deleteFile(image.getFilePath()));
+                    images.forEach(image -> fileHandler.deleteFile(image.getFilePath()));
                 });
 
         videoRepository.findVideosByProfile(profile)

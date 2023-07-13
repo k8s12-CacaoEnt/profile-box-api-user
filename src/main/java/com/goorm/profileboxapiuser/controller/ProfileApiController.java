@@ -3,16 +3,19 @@ package com.goorm.profileboxapiuser.controller;
 import com.goorm.profileboxapiuser.service.ProfileService;
 import com.goorm.profileboxcomm.dto.profile.request.CreateProfileRequestDto;
 import com.goorm.profileboxcomm.dto.profile.request.SelectProfileListRequestDto;
+import com.goorm.profileboxcomm.dto.profile.response.SelectProfileListResponseDto;
 import com.goorm.profileboxcomm.dto.profile.response.SelectProfileResponseDto;
 import com.goorm.profileboxcomm.entity.Profile;
 import com.goorm.profileboxcomm.exception.ApiException;
 import com.goorm.profileboxcomm.exception.ExceptionEnum;
 import com.goorm.profileboxcomm.response.ApiResult;
 import com.goorm.profileboxcomm.response.ApiResultType;
+import com.goorm.profileboxcomm.service.MemberRedisService;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -26,13 +29,27 @@ import static java.util.stream.Collectors.toList;
 @RequestMapping("/v1")
 public class ProfileApiController {
     private final ProfileService profileService;
+    private final MemberRedisService memberRedisService;
+
+    @GetMapping("/open/save/cache")
+    public ApiResult saveCache() {
+        memberRedisService.saveCacheTest();
+        return ApiResult.getResult(ApiResultType.SUCCESS, "캐시 저장", null);
+    }
+
+    @GetMapping("/open/get/cache")
+    public ApiResult getCache() {
+        memberRedisService.getCacheTest();
+        return ApiResult.getResult(ApiResultType.SUCCESS, "캐시 조회", null);
+    }
 
     @GetMapping("/open/profile")
     public ApiResult<List<SelectProfileResponseDto>> getProfiles(@ModelAttribute SelectProfileListRequestDto requestDto) {
         Page<Profile> profiles = profileService.getAllProfile(requestDto);
-        List<SelectProfileResponseDto> result = profiles.stream()
+        List<SelectProfileResponseDto> dtoList = profiles.stream()
                 .map(o -> new SelectProfileResponseDto(o))
                 .collect(toList());
+        SelectProfileListResponseDto result = new SelectProfileListResponseDto(profiles.getTotalPages(), profiles.getTotalElements(), dtoList);
         return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회", result);
     }
 
@@ -56,9 +73,7 @@ public class ProfileApiController {
                 throw new ApiException(ExceptionEnum.INVALID_REQUEST);
         }
         Long profileId = profileService.addProfile(profileDto, imageFiles, videoFiles);
-    //    Profile profile = profileService.getProfileByProfileId(profileId);
-    //    SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
-        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", profileId);
+        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 등록", profileId, HttpStatus.CREATED);
     }
 
 

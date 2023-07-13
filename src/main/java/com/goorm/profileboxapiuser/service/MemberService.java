@@ -4,7 +4,9 @@ import com.goorm.profileboxapiuser.auth.JwtProperties;
 import com.goorm.profileboxcomm.entity.Member;
 import com.goorm.profileboxcomm.exception.ApiException;
 import com.goorm.profileboxcomm.exception.ExceptionEnum;
+import com.goorm.profileboxcomm.repository.MemberRepository;
 import com.goorm.profileboxcomm.response.ApiResult;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
@@ -25,7 +27,7 @@ import java.util.concurrent.ExecutionException;
 public class MemberService {
 
 //    private final ProducerService producerService;
-
+    private final MemberRepository memberRepository;
     private final KafkaTemplate<String, String> kafkaTemplate;
     private final RestTemplate restTemplate;
     private static final String TOPIC_NAME = "user-authenticated";
@@ -33,12 +35,19 @@ public class MemberService {
     @Value("${server.host.adminApi}")
     private String adminApiUrl;
 
+    @Transactional
+    public Member findLoginMemberByEmail(String email) {
+        Member member =  memberRepository.findMemberByMemberEmail(email)
+                .orElseThrow(() -> new ApiException(ExceptionEnum.LOGIN_FAILED));
+        return member;
+    }
+
     // admin api로 요청해야함
     public Member findLoginMemberByEmail(String email, String clientJwtToken) throws ExecutionException, InterruptedException {
         String url = adminApiUrl;
         HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.COOKIE, JwtProperties.ACCESS_TOKEN_COOKIE + "=" + clientJwtToken);
-
+//        headers.set(HttpHeaders.COOKIE, JwtProperties.ACCESS_TOKEN_COOKIE + "=" + clientJwtToken);
+        headers.set(HttpHeaders.AUTHORIZATION, JwtProperties.TOKEN_PREFIX + clientJwtToken);
 
         HttpEntity<?> requestEntity = new HttpEntity<>(headers);
 
