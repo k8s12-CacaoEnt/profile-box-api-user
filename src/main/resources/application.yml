@@ -70,6 +70,10 @@ spring:
     url: jdbc:postgresql://localhost:5432/profile_box
     username: admin
     password: admin
+  data:
+    redis:
+      host: localhost
+      port: 6379
 #  kafka:
 #    bootstrap-servers: localhost:9092
 #    consumer:
