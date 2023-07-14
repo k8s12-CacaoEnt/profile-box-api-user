@@ -43,6 +43,13 @@ public class ProfileService {
         return profileRepository.findAll(PageRequest.of(offset, limit, Sort.by(sortKey)));
     }
 
+//    public Page<Profile> getProfileByFilmoName(SelectProfileListByFilmoRequestDto requestDto) {
+//        int offset = requestDto.getOffset() < 1 ? 0 : requestDto.getOffset() - 1 ;
+//        int limit = requestDto.getLimit() < 1 ? 10 : requestDto.getLimit();
+//        String sortKey = requestDto.getSortKey();
+//        return profileRepository.findAll(PageRequest.of(offset, limit, Sort.by(sortKey)));
+//    }
+
     public Profile getProfileByProfileId(Long profileId) {
         return profileRepository.findProfileByProfileId(profileId)
                 .orElseThrow(() -> new ApiException(ExceptionEnum.PROFILE_NOT_FOUND));
