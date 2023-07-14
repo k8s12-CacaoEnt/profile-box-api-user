@@ -72,7 +72,7 @@ public class ProfileService {
         Profile profile = Profile.createProfile(profileDto, member);
         profileRepository.save(profile);
 
-        if (images != null & images.size() > 1) {
+        if (images != null & !images.get(0).getOriginalFilename().isEmpty()) {
             if (profileDto.getDefaultImageIdx() < 0 || profileDto.getDefaultImageIdx() > images.size() - 1) {
                 profileDto.setDefaultImageIdx(0);
             }
@@ -92,7 +92,7 @@ public class ProfileService {
             imageRepository.saveAll(imageList);
         }
 
-        if (videos != null & videos.size() > 1) {
+        if (videos != null & !videos.get(0).getOriginalFilename().isEmpty()) {
             List<Video> videoList = new ArrayList<>();
             List<CreateVideoRequestDto> videoDtoList = videos.stream()
                     .map(o -> fileHandler.videoWrite(o))
