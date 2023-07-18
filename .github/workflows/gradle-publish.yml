@@ -21,10 +21,16 @@ jobs:
       packages: write
 
     steps:
-    - name: Checkout Code
+    - name: Checkout Root Code
       uses: actions/checkout@v3
       with:
         repository: k8s12-CacaoEnt/profilehub
+        ref: main 
+
+    - name: Checkout Repo Code
+      uses: actions/checkout@v3
+      with:
+        repository: k8s12-CacaoEnt/profile-box-api-user
         ref: main 
       
     - name: Configure AWS credentials
