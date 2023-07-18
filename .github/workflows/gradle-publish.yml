@@ -41,6 +41,7 @@ jobs:
     
     - name: List Files
       run: |
+        cd profile-box-api-user
         pwd
         ls -la
         
@@ -53,6 +54,7 @@ jobs:
     
     - name: List Files
       run: |
+        cd profile-box-comm
         pwd
         ls -la
       
