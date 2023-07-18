@@ -26,11 +26,6 @@ jobs:
 
     steps:
     
-    - name: Automatic token authentication
-      uses: actions/labeler@v4
-      with:
-          repo-token: ${{ secrets.GIT_TOKEN }}
-          
     - name: Checkout Root Code
       uses: actions/checkout@v3
       with:
