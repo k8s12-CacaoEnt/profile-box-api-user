@@ -86,7 +86,7 @@ jobs:
       
     - name: Update GitOps YAML Version and Commit
       run: |
-          cd ${{ env.GITOPS_REPOSITORY }}/${{ GITOPS_DIR }}
+          cd ${{ env.GITOPS_REPOSITORY }}/${{ env.GITOPS_DIR }}
           sed -i 's/${{ env.AWS_ECR_REPOSITORY }}:.*/${{ env.AWS_ECR_REPOSITORY }}:${{ env.IMG_TAG }}/' ${{env.GITOPS_YAML_FILE}}
           git config user.name ${{ secrets.USER_NAME }}
           git config user.email ${{ secrets.USER_EMAIL }}
