@@ -26,6 +26,12 @@ jobs:
       packages: write
 
     steps:
+    
+    - name: Automatic token authentication
+      uses: actions/labeler@v4
+      with:
+          repo-token: ${{ secrets.GIT_TOKEN }}
+          
     - name: Checkout Root Code
       uses: actions/checkout@v3
       with:
@@ -92,5 +98,7 @@ jobs:
           git config user.email ${{ secrets.USER_EMAIL }}
           git add ${{ env.GITOPS_YAML_FILE }}
           git commit -m "Update YAML Image Tag To ${{ env.IMG_TAG }}"
+          git push origin main
           cat ${{ env.GITOPS_YAML_FILE }}
+          
 # git push http://${{ secrets.USER_NAME }}:${{ secrets.GIT_TOKEN }}@${GITEA_DOMAIN}${YAML_REPO}
