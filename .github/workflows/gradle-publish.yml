@@ -76,7 +76,7 @@ jobs:
     - name: Build with Gradle
       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
       with:
-        arguments: build -Dspring.profiles.active=local
+        arguments: build
     
     - name: Login to Amazon ECR
       id: login-ecr
