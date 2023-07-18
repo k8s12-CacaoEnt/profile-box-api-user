@@ -98,7 +98,13 @@ jobs:
           git config user.email ${{ secrets.USER_EMAIL }}
           git add ${{ env.GITOPS_YAML_FILE }}
           git commit -m "Update YAML Image Tag To ${{ env.IMG_TAG }}"
-          git push http://${{ secrets.USER_NAME }}:${{ secrets.GIT_TOKEN }}@github.com/${{ env.ORGANIZATION_NAME }}/${{ env.GITOPS_REPOSITORY }}.git
+          
+    - name: Push changes
+      uses: ad-m/github-push-action@master
+      with:
+        github_token: ${{ secrets.GIT_TOKEN }}
+        branch: main
 
+# git push http://${{ secrets.USER_NAME }}:${{ secrets.GIT_TOKEN }}@github.com/${{ env.ORGANIZATION_NAME }}/${{ env.GITOPS_REPOSITORY }}.git
 # git push origin main
 # git remote set-url origin https://$MY_NAME:${{ secrets.MY_PASSWORD }}@github.com/Einere/homepage.git
