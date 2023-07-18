@@ -25,13 +25,14 @@ jobs:
       uses: actions/checkout@v3
       with:
         repository: k8s12-CacaoEnt/profilehub
-        ref: main 
+        ref: main
 
-    - name: Checkout Repo Code
+    - name: Checkout Sub Code
       uses: actions/checkout@v3
       with:
         repository: k8s12-CacaoEnt/profile-box-api-user
-        ref: main 
+        ref: main
+        path: profile-box-api-user
       
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -62,6 +63,8 @@ jobs:
         ls
         pwd
         cd profile-box-api-user
+        ls
+        pwd
         docker build --no-cache -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}} .
         docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}}
       
