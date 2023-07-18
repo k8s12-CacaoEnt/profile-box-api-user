@@ -10,8 +10,8 @@ env:
   USER_GIT_REPOSITORY: profile-box-api-user
   COMM_REPOSITORY: profile-box-comm
   GITOPS_REPOSITORY: profile-box-gitops
-  GITOPS_DIR: gitops
-  GITOPS_YAML_FILE: profile-box-api-user.yaml
+  GITOPS_DIR: gitops/api-user/prod
+  GITOPS_YAML_FILE: deployment.yaml
   AWS_REGION: ap-northeast-2
   AWS_ECR_REGISTRY: 204770130849.dkr.ecr.ap-northeast-2.amazonaws.com
   AWS_ECR_REPOSITORY: profile-box-api-user
