@@ -89,21 +89,40 @@ jobs:
         pwd
         docker build --no-cache -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}} .
         docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}}
-      
+  
     - name: Update GitOps YAML Version and Commit
       run: |
           cd ${{ env.GITOPS_REPOSITORY }}/${{ env.GITOPS_DIR }}
           sed -i 's/${{ env.AWS_ECR_REPOSITORY }}:.*/${{ env.AWS_ECR_REPOSITORY }}:${{ env.IMG_TAG }}/' ${{env.GITOPS_YAML_FILE}}
-          git config user.name ${{ secrets.USER_NAME }}
-          git config user.email ${{ secrets.USER_EMAIL }}
-          git add ${{ env.GITOPS_YAML_FILE }}
-          git commit -m "Update YAML Image Tag To ${{ env.IMG_TAG }}"
           
-    - name: Push changes
-      uses: ad-m/github-push-action@master
+    - name: Push to another repo
+      uses: dmnemec/copy_file_to_another_repo_action@main
+      env:
+        API_TOKEN_GITHUB: ${{ secrets.GIT_TOKEN }} 
       with:
-        github_token: ${{ secrets.GIT_TOKEN }}
-        branch: main
+        path: ${{ env.GITOPS_REPOSITORY }}
+        target-branch: main
+        source_file: ${{ env.GITOPS_DIR }}/${{env.GITOPS_YAML_FILE}}
+        destination_repo: ${{ env.ORGANIZATION_NAME }}/${{ env.GITOPS_REPOSITORY }}
+        destination_folder: ${{ env.GITOPS_DIR }} 
+        user_email: ${{ secrets.USER_EMAIL }}     
+        user_name: ${{ secrets.USER_NAME }} 
+        commit_message: 'Update YAML Image Tag To ${{ env.IMG_TAG }}'
+    
+#     - name: Update GitOps YAML Version and Commit
+#       run: |
+#           cd ${{ env.GITOPS_REPOSITORY }}
+#           sed -i 's/${{ env.AWS_ECR_REPOSITORY }}:.*/${{ env.AWS_ECR_REPOSITORY }}:${{ env.IMG_TAG }}/' ${{ env.GITOPS_DIR }}/${{env.GITOPS_YAML_FILE}}
+#           git config user.name ${{ secrets.USER_NAME }}
+#           git config user.email ${{ secrets.USER_EMAIL }}
+#           git add ${{ env.GITOPS_YAML_FILE }}
+#           git commit -m "Update YAML Image Tag To ${{ env.IMG_TAG }}"
+          
+#     - name: Push changes
+#       uses: ad-m/github-push-action@master
+#       with:
+#         github_token: ${{ secrets.GIT_TOKEN }}
+#         branch: main
 
 # git push http://${{ secrets.USER_NAME }}:${{ secrets.GIT_TOKEN }}@github.com/${{ env.ORGANIZATION_NAME }}/${{ env.GITOPS_REPOSITORY }}.git
 # git push origin main
