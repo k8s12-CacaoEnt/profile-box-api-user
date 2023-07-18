@@ -5,10 +5,17 @@ on:
     branches: [ main ]
 
 env: 
+  ORGANIZATION_NAME: k8s12-CacaoEnt
+  ROOT_REPOSITORY: profilehub
+  USER_GIT_REPOSITORY: profile-box-api-user
+  COMM_REPOSITORY: profile-box-comm
+  GITOPS_REPOSITORY: profile-box-gitops
   AWS_REGION: ap-northeast-2
   AWS_ECR_REGISTRY: 204770130849.dkr.ecr.ap-northeast-2.amazonaws.com
   AWS_ECR_REPOSITORY: profile-box-api-user
   IMG_TAG: ${{ github.sha }}
+  GITOPS_YAML_FILE: profile-box-api-user.yaml
+  
 #   EKS_CLUSTER_NAME: education-eks-B7gsMBzN
 #   DEPLOYMENT_NAME: dev-front
 #   CONTAINER_NAME: demo-frontend
@@ -24,39 +31,29 @@ jobs:
     - name: Checkout Root Code
       uses: actions/checkout@v3
       with:
-        repository: k8s12-CacaoEnt/profilehub
+        repository: ${{ env.ORGANIZATION_NAME }}/${{ env.ROOT_REPOSITORY }}
         ref: main
-        
-    - name: List Files
-      run: |
-        pwd
-        ls -la
 
     - name: Checkout Sub Code
       uses: actions/checkout@v3
       with:
-        repository: k8s12-CacaoEnt/profile-box-api-user
+        repository: ${{ env.ORGANIZATION_NAME }}/${{ env.USER_GIT_REPOSITORY }}
         ref: main
-        path: profile-box-api-user
-    
-    - name: List Files
-      run: |
-        cd profile-box-api-user
-        pwd
-        ls -la
+        path: ${{ env.USER_GIT_REPOSITORY }}
         
     - name: Checkout Comm Code
       uses: actions/checkout@v3
       with:
-        repository: k8s12-CacaoEnt/profile-box-comm
+        repository: ${{ env.ORGANIZATION_NAME }}/${{ env.COMM_REPOSITORY }}
         ref: main
-        path: profile-box-comm
+        path: ${{ env.COMM_REPOSITORY }}
     
-    - name: List Files
-      run: |
-        cd profile-box-comm
-        pwd
-        ls -la
+    - name: Checkout GitOps Code
+      uses: actions/checkout@v3
+      with:
+        repository: ${{ env.ORGANIZATION_NAME }}/${{ env.GITOPS_REPOSITORY }}
+        ref: main
+        path: ${{ env.GITOPS_REPOSITORY }}
       
     - name: Configure AWS credentials
       uses: aws-actions/configure-aws-credentials@v1
@@ -84,21 +81,17 @@ jobs:
         
     - name: Build, tag, and push image to Amazon ECR
       run: |
-        ls
-        pwd
-        cd profile-box-api-user
-        ls
+        cd ${{ env.USER_GIT_REPOSITORY }}
         pwd
         docker build --no-cache -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}} .
         docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}}
       
-
-    # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
-    # the publishing section of your build.gradle
-#     - name: Publish to GitHub Packages
-#       uses: gradle/gradle-build-action@bd5760595778326ba7f1441bcf7e88b49de61a25 # v2.6.0
-#       with:
-#         arguments: publish
-#       env:
-#         USERNAME: ${{ github.actor }}
-#         TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update GitOps YAML Version and Commit
+      run: |
+          cd ${{ env.GITOPS_REPOSITORY }}
+          sed -i 's/env.ecrRegistry\/env.ecrRepository:.*$/env.ecrRegistry\/env.ecrRepository:${{ env.IMG_TAG }}/' ${{env.GITOPS_YAML_FILE}}
+          git config user.name ${{ secrets.USER_NAME }}
+          git config user.email ${{ secrets.USER_EMAIL }}
+          git add ${{ env.GITOPS_YAML_FILE }}
+          git commit -m "Update YAML Image Tag To ${{ env.IMG_TAG }}"
+# git push http://${{ secrets.USER_NAME }}:${{ secrets.GIT_TOKEN }}@${GITEA_DOMAIN}${YAML_REPO}
