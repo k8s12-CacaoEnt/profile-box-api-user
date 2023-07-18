@@ -53,9 +53,9 @@ jobs:
         
     - name: Build, tag, and push image to Amazon ECR
       run: |
+        cd profile-box-api-user
         docker build --no-cache -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}} .
         docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}}
-      working-directory: ./profile-box-api-user
       
 
     # The USERNAME and TOKEN need to correspond to the credentials environment variables used in
