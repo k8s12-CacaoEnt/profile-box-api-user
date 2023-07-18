@@ -12,7 +12,6 @@ env:
   GITOPS_REPOSITORY: profile-box-gitops
   GITOPS_DIR: gitops
   GITOPS_YAML_FILE: profile-box-api-user.yaml
-  
   AWS_REGION: ap-northeast-2
   AWS_ECR_REGISTRY: 204770130849.dkr.ecr.ap-northeast-2.amazonaws.com
   AWS_ECR_REPOSITORY: profile-box-api-user
@@ -101,15 +100,3 @@ jobs:
           git add ${{ env.GITOPS_DIR }}/${{ env.GITOPS_YAML_FILE }}
           git commit -m "Update YAML Image Tag To ${{ env.IMG_TAG }}"
           git push origin main
-
-# git push http://${{ secrets.USER_NAME }}:${{ secrets.GIT_TOKEN }}@github.com/${{ env.ORGANIZATION_NAME }}/${{ env.GITOPS_REPOSITORY }}.git
-          
-#     - name: Push changes
-#       uses: ad-m/github-push-action@master
-#       with:
-#         github_token: ${{ secrets.GIT_TOKEN }}
-#         branch: main
-
-# git push http://${{ secrets.USER_NAME }}:${{ secrets.GIT_TOKEN }}@github.com/${{ env.ORGANIZATION_NAME }}/${{ env.GITOPS_REPOSITORY }}.git
-# git push origin main
-# git remote set-url origin https://$MY_NAME:${{ secrets.MY_PASSWORD }}@github.com/Einere/homepage.git
