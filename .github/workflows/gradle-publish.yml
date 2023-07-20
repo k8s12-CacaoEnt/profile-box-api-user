@@ -7,7 +7,7 @@ on:
 env: 
   ORGANIZATION_NAME: k8s12-CacaoEnt
   ROOT_REPOSITORY: profilehub
-  USER_GIT_REPOSITORY: profile-box-api-user
+  USER_REPOSITORY: profile-box-api-user
   COMM_REPOSITORY: profile-box-comm
   GITOPS_REPOSITORY: profile-box-gitops
   GITOPS_DIR: gitops/api-user/prod
@@ -35,9 +35,9 @@ jobs:
     - name: Checkout Sub Code
       uses: actions/checkout@v3
       with:
-        repository: ${{ env.ORGANIZATION_NAME }}/${{ env.USER_GIT_REPOSITORY }}
+        repository: ${{ env.ORGANIZATION_NAME }}/${{ env.USER_REPOSITORY }}
         ref: main
-        path: ${{ env.USER_GIT_REPOSITORY }}
+        path: ${{ env.USER_REPOSITORY }}
         
     - name: Checkout Comm Code
       uses: actions/checkout@v3
@@ -80,7 +80,7 @@ jobs:
         
     - name: Build, tag, and push image to Amazon ECR
       run: |
-        cd ${{ env.USER_GIT_REPOSITORY }}
+        cd ${{ env.USER_REPOSITORY }}
         pwd
         docker build --no-cache -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}} .
         docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}}
