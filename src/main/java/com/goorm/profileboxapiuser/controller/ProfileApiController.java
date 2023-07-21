@@ -50,8 +50,8 @@ public class ProfileApiController {
 //        return ApiResult.getResult(ApiResultType.SUCCESS, "프로필 리스트 조회(필모 이름)", result);
 //    }
 
-    @PreAuthorize("hasAnyAuthority('ADMIN','PRODUCER','ACTOR')")
-    @GetMapping("/profile/{profileId}")
+//    @PreAuthorize("hasAnyAuthority('ADMIN','PRODUCER','ACTOR')")
+    @GetMapping("/open/profile/{profileId}")
     public ApiResult<SelectProfileResponseDto> getProfile(@PathVariable Long profileId){
         Profile profile = profileService.getProfileByProfileId(profileId);
         SelectProfileResponseDto result = new SelectProfileResponseDto(profile);
