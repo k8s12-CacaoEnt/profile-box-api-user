@@ -60,7 +60,6 @@ server:
     max-swallow-size: -1
   host:
     adminApi: http://localhost:7002
-    commApi: http://localhost:7003
 
 spring:
   config:
