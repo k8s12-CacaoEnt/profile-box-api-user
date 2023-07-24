@@ -81,7 +81,6 @@ jobs:
     - name: Build, tag, and push image to Amazon ECR
       run: |
         cd ${{ env.USER_REPOSITORY }}
-        pwd
         docker build --no-cache -t ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}} .
         docker push ${{ env.AWS_ECR_REGISTRY }}/${{ env.AWS_ECR_REPOSITORY }}:${{env.IMG_TAG}}
   
@@ -93,5 +92,5 @@ jobs:
           git config user.name ${{ secrets.USER_NAME }}
           git config user.email ${{ secrets.USER_EMAIL }}
           git add ${{ env.GITOPS_DIR }}/${{ env.GITOPS_YAML_FILE }}
-          git commit -m "Update YAML Image Tag To ${{ env.IMG_TAG }}"
+          git commit -m "[ci-cd-api-user] Update YAML Image Tag To ${{ env.IMG_TAG }}"
           git push origin main
