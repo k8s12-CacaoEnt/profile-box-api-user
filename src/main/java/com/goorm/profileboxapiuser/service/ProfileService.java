@@ -40,7 +40,8 @@ public class ProfileService {
         int offset = requestDto.getOffset() < 1 ? 0 : requestDto.getOffset() - 1 ;
         int limit = requestDto.getLimit() < 1 ? 10 : requestDto.getLimit();
         String sortKey = requestDto.getSortKey();
-        return profileRepository.findAll(PageRequest.of(offset, limit, Sort.by(sortKey)));
+        Sort.Direction sortDirection = getSrotDirection(requestDto.getSortDirection());
+        return profileRepository.findAll(PageRequest.of(offset, limit, Sort.by(sortDirection, sortKey)));
     }
 
 //    public Page<Profile> getProfileByFilmoName(SelectProfileListByFilmoRequestDto requestDto) {
@@ -188,5 +189,21 @@ public class ProfileService {
                 .orElseThrow(() -> new ApiException(ExceptionEnum.LINK_NOT_FOUND));
 
         linkRepository.deleteByLinkId(linkId);
+    }
+
+    public Sort.Direction getSrotDirection(String strDirection){
+        Sort.Direction sortDirection = null;
+        switch (strDirection) {
+            case "ASC":
+                sortDirection = Sort.Direction.ASC;
+                break;
+            case "DESC":
+                sortDirection = Sort.Direction.DESC;
+                break;
+            default:
+                sortDirection = Sort.Direction.DESC;
+                break;
+        }
+        return sortDirection;
     }
 }
